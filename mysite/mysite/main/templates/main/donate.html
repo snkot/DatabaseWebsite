@@ -20,8 +20,14 @@
     </div>
   </div>
     <div class="container">
-        <h1>Last donations</h1>
-        <p>{{ donations }}</p>
+        <h1>Donate to project</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.sum }}<br>
+            {{ form.comment }}<br>
+            {{ form.idproject }}<br>
+            <button type="submit" class="btn btn-success">Sent</button>
+        </form>
     </div>
 </body>
 </html>
