@@ -6,6 +6,7 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.utils import timezone
 
 
 class AuthGroup(models.Model):
@@ -173,11 +174,21 @@ class DjangoSession(models.Model):
 
 class Donations(models.Model):
     #id = models.IntegerField(primary_key=True)
-    sum = models.DecimalField(max_digits=65535, decimal_places=65535)
+    sum = models.DecimalField(max_digits=999, decimal_places=2)
     comment = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateTimeField()
     iduser = models.ForeignKey('Users', models.DO_NOTHING, db_column='idUser')  # Field name made lowercase.
     idproject = models.ForeignKey('Projects', models.DO_NOTHING, db_column='idProject')  # Field name made lowercase.
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.date = timezone.now()
+            self.iduser = Users.objects.get(id=47)
+        return super(Donations, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return str(self.sum)
 
     class Meta:
         managed = False
@@ -240,6 +251,9 @@ class Projects(models.Model):
     releasedate = models.TimeField(db_column='releaseDate')  # Field name made lowercase.
     iduser = models.ForeignKey('Users', models.DO_NOTHING, db_column='idUser')  # Field name made lowercase.
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         managed = False
         db_table = 'projects'
@@ -249,6 +263,9 @@ class Role(models.Model):
     #id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255)
     access = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         managed = False
@@ -264,6 +281,9 @@ class Users(models.Model):
     avatar = models.CharField(max_length=255, blank=True, null=True)
     contact = models.CharField(max_length=255, blank=True, null=True)
     idrole = models.ForeignKey(Role, models.DO_NOTHING, db_column='idRole')  # Field name made lowercase.
+
+    def __str__(self):
+        return self.login
 
     class Meta:
         managed = False

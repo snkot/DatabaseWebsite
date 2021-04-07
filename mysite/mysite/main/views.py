@@ -4,8 +4,8 @@ from .models import Donations
 
 
 def index(request):
-    donations = Donations.objects.all
-    return render(request, 'main/index.html', {'donations': Donations})
+    donations = Donations.objects.order_by('-id')[:3]
+    return render(request, 'main/index.html', {'donations': donations})
 
 def dashboard(request):
     return render(request, 'main/dashboard.html')
